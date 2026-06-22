@@ -1,0 +1,192 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ideja za trenere — aplikacija za treninge</title>
+<style>
+  :root{
+    --paper:#F7F4EC; --ink:#221F18; --soft:#544F44; --faint:#8C8475;
+    --line:#E7E1D3; --hair:#EEE9DC; --accent:#45604E; --accent-d:#374F3E; --hl:#E9EFE9;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  ::selection{background:var(--hl)}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans);
+    font-size:17px; line-height:1.66; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility}
+  .doc{max-width:620px; margin:0 auto; padding:64px 24px 88px}
+  p{margin:14px 0; color:var(--soft)}
+  strong{color:var(--ink); font-weight:600}
+  h1{margin:0; font-size:clamp(27px,5.2vw,33px); line-height:1.22; font-weight:600; letter-spacing:-.021em; color:var(--ink)}
+  h2{margin:0; font-size:20px; line-height:1.3; font-weight:600; letter-spacing:-.012em; color:var(--ink)}
+  .kicker{margin:0 0 16px; font-size:11.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--accent); font-weight:600}
+  .sub{margin:16px 0 0; font-size:18.5px; line-height:1.5; color:var(--ink); font-weight:400}
+
+  section{padding:46px 0; border-top:1px solid var(--line)}
+  section:first-of-type{padding-top:4px; border-top:none}
+  h2 + .anchor, h2 + p, .kicker + h2{margin-top:14px}
+
+  /* numbered process — a real sequence, so numbers earn their place */
+  ol.plain{margin:20px 0 0; padding:0; list-style:none; counter-reset:s}
+  ol.plain li{position:relative; padding:13px 0 13px 40px; color:var(--soft); border-bottom:1px solid var(--hair)}
+  ol.plain li:last-child{border-bottom:none}
+  ol.plain li::before{counter-increment:s; content:counter(s); position:absolute; left:0; top:11px;
+    width:25px; height:25px; border:1px solid var(--line); border-radius:50%; color:var(--accent);
+    font-size:12.5px; font-weight:600; display:grid; place-items:center}
+  ol.plain b{color:var(--ink); font-weight:600}
+
+  /* the one place we let the offer be the loudest thing — calmly */
+  .anchor{font-size:clamp(19px,2.7vw,22px); line-height:1.48; color:var(--ink); font-weight:400; letter-spacing:-.006em}
+  .anchor .pc{color:var(--accent-d); font-weight:600}
+
+  .rows{margin:22px 0 0}
+  .rows .r{display:flex; gap:20px; padding:14px 0; border-bottom:1px solid var(--hair)}
+  .rows .r:last-child{border-bottom:none}
+  .rows .lbl{flex:0 0 118px; color:var(--ink); font-weight:600; font-size:14.5px}
+  .rows .val{color:var(--soft); font-size:15.5px; line-height:1.55}
+
+  .note{margin-top:24px; padding:17px 19px; background:#FCFBF6; border:1px solid var(--line); border-radius:13px; font-size:15.5px; line-height:1.6; color:var(--soft)}
+  .note b{color:var(--ink); font-weight:600}
+
+  ul.alts{margin:18px 0 0; padding:0; list-style:none}
+  ul.alts li{padding:14px 0; border-bottom:1px solid var(--hair); color:var(--soft); font-size:15.5px; line-height:1.58}
+  ul.alts li:last-child{border-bottom:none}
+  ul.alts b{color:var(--ink); font-weight:600}
+  .verdict{margin-top:22px; padding-left:17px; border-left:2px solid var(--accent); color:var(--ink); font-size:16px; line-height:1.6}
+
+  /* mockups — calm, consistent, just enough to show it's real */
+  .shots{display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-top:26px}
+  .shot{width:176px}
+  .phone{width:176px; aspect-ratio:9/18.6; background:#2a2720; border-radius:25px; padding:7px;
+    box-shadow:0 20px 44px -26px rgba(34,31,24,.5)}
+  .screen{height:100%; border-radius:19px; overflow:hidden; background:#FCFBF6; display:flex; flex-direction:column}
+  .top{background:#32302a; color:#F2EFE7; padding:17px 12px 10px; font-size:11.5px; font-weight:600; display:flex; justify-content:space-between; align-items:center}
+  .top .d{width:17px; height:17px; border-radius:50%; background:var(--accent)}
+  .scr{padding:11px; display:flex; flex-direction:column; gap:9px; flex:1; overflow:hidden}
+  .lab{font-size:9px; letter-spacing:.09em; text-transform:uppercase; color:var(--faint)}
+  .it{display:flex; gap:9px; align-items:center}
+  .tn{width:48px; height:36px; border-radius:8px; flex:0 0 48px}
+  .tn.a{background:linear-gradient(135deg,#7c8b7f,#4a5a4f)}
+  .tn.b{background:linear-gradient(135deg,#9a8e79,#6b6253)}
+  .tn.c{background:linear-gradient(135deg,#868f8b,#586460)}
+  .it .m b{display:block; font-size:10.5px; color:var(--ink); font-weight:600}
+  .it .m span{font-size:9px; color:var(--faint)}
+  .player{height:92px; border-radius:9px; background:linear-gradient(135deg,#3a4f43,#2a2720); display:grid; place-items:center}
+  .player .pl{width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,.93); display:grid; place-items:center}
+  .barline{height:5px; border-radius:3px; background:#e3ddce; overflow:hidden}
+  .barline i{display:block; height:100%; width:58%; background:var(--accent)}
+  .mini{font-size:10.5px; color:var(--soft)}
+  .done{display:flex; align-items:center; gap:8px; font-size:10.5px; color:var(--soft)}
+  .ck{width:15px; height:15px; border-radius:4px; background:var(--accent); flex:0 0 15px; display:grid; place-items:center}
+  .ck.o{background:transparent; border:1.4px solid #cdc6b4}
+  .cap{font-size:12px; color:var(--faint); text-align:center; margin-top:11px}
+
+  .end{font-size:18px; line-height:1.5; color:var(--ink)}
+  footer{margin-top:50px; padding-top:22px; border-top:1px solid var(--line); font-size:12.5px; color:var(--faint)}
+
+  @media(max-width:560px){
+    .doc{padding:44px 20px 72px}
+    .sub{font-size:17.5px}
+    .rows .r{flex-direction:column; gap:3px}
+    .rows .lbl{flex:none}
+  }
+</style>
+
+<div class="doc">
+
+  <section>
+    <p class="kicker">Za trenere</p>
+    <h1>Aplikacija u kojoj tvoji ljudi treniraju uz tebe.</h1>
+    <p class="sub">Plaćaju mjesečnu pretplatu i treniraju po tvojim video programima, sa telefona, kad god žele. Ti treniraš ljude — ja vodim sve ostalo.</p>
+    <p>Gradim ovo za trenere i htio sam ti iskreno objasniti kako bi funkcionisalo i šta bi značilo za tebe. Bez uljepšavanja — pa procijeni sam.</p>
+  </section>
+
+  <section>
+    <p class="kicker">Kako radi</p>
+    <ol class="plain">
+      <li><b>Postaviš svoje treninge</b> i složiš ih u programe (npr. snaga, kondicija, priprema za sezonu).</li>
+      <li><b>Odrediš cijenu</b> mjesečne pretplate — ti, ne ja. Mijenjaš je kad hoćeš.</li>
+      <li><b>Podijeliš link</b> svojim ljudima. Otvara se u telefonu, bez instalacije.</li>
+      <li><b>Naplata ide sama</b> svakog mjeseca. Ti se ne baviš karticama ni fakturama.</li>
+    </ol>
+  </section>
+
+  <section>
+    <p class="kicker">Kako izgleda</p>
+    <p>Otprilike ovako — sa tvojim imenom i bojama, ne mojim. Ovo su skice, ne gotov proizvod.</p>
+    <div class="shots">
+      <div class="shot">
+        <div class="phone"><div class="screen">
+          <div class="top"><span>Tvoj klub</span><span class="d"></span></div>
+          <div class="scr">
+            <span class="lab">Programi</span>
+            <div class="it"><span class="tn a"></span><span class="m"><b>Snaga i kondicija</b><span>12 treninga</span></span></div>
+            <div class="it"><span class="tn b"></span><span class="m"><b>Priprema za sezonu</b><span>9 treninga</span></span></div>
+            <div class="it"><span class="tn c"></span><span class="m"><b>Mobilnost</b><span>6 treninga</span></span></div>
+          </div>
+        </div></div>
+        <p class="cap">Tvoji programi</p>
+      </div>
+      <div class="shot">
+        <div class="phone"><div class="screen">
+          <div class="top"><span>Trening 4</span><span class="d"></span></div>
+          <div class="scr">
+            <div class="player"><span class="pl"><svg width="12" height="13" viewBox="0 0 12 13" fill="#374F3E"><path d="M0 0l12 6.5L0 13z"/></svg></span></div>
+            <span class="mini">38 min · srednji nivo</span>
+            <span class="lab">Napredak</span>
+            <div class="barline"><i></i></div>
+            <span class="mini">Nastavi gdje si stao.</span>
+          </div>
+        </div></div>
+        <p class="cap">Trening</p>
+      </div>
+      <div class="shot">
+        <div class="phone"><div class="screen">
+          <div class="top"><span>Napredak</span><span class="d"></span></div>
+          <div class="scr">
+            <span class="lab">Ova nedjelja</span>
+            <div class="done"><span class="ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.4"><path d="M2 6.5l2.5 2.5L10 3"/></svg></span> Snaga — dan 3</div>
+            <div class="done"><span class="ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.4"><path d="M2 6.5l2.5 2.5L10 3"/></svg></span> Snaga — dan 4</div>
+            <div class="done"><span class="ck o"></span> Mobilnost — dan 1</div>
+            <div class="done"><span class="ck o"></span> Kondicija — dan 2</div>
+          </div>
+        </div></div>
+        <p class="cap">Šta članovi prate</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">Dogovor</p>
+    <h2>Šta plaćaš, šta zadržavaš</h2>
+    <p class="anchor">Ne plaćaš ništa unaprijed — aplikaciju gradim o svom trošku. Od svega što se naplati, tebi ostaje <span class="pc">70%</span>, a poslije dvije godine <span class="pc">85%</span>.</p>
+    <div class="rows">
+      <div class="r"><span class="lbl">Troškovi rada</span><span class="val">Samo stvarni — serveri i video, par desetina eura mjesečno. Pokazujem ti svaki račun.</span></div>
+      <div class="r"><span class="lbl">Meni</span><span class="val">30%, pa 15% poslije dvije godine — jer gradim i vodim sve umjesto tebe.</span></div>
+    </div>
+    <p class="note"><b>Nije fiksni račun.</b> Ne plaćaš mi pretplatu. Uzimam dio tek od onoga što zaista uđe — ako je mjesec slab, slab je i za mene. Nikad mi ne ostaješ dužan. Zaradim tek kad i ti zaradiš.</p>
+  </section>
+
+  <section>
+    <p class="kicker">Iskreno o alternativama</p>
+    <h2>Nisam jedina opcija</h2>
+    <p>Postoje i drugi načini — evo kako stvarno stoje:</p>
+    <ul class="alts">
+      <li><b>Instagram i WhatsApp.</b> Besplatno, ali treninge šalješ ručno — svakom klijentu posebno, ista poruka iznova i iznova. Nema stabilnog prihoda, a publika pripada mreži, ne tebi.</li>
+      <li><b>Aplikacija na App Store-u.</b> Apple i Google uzmu 30% od svake naplate, a sama izrada košta nekoliko hiljada eura unaprijed.</li>
+      <li><b>Alati tipa Kajabi ili Uscreen.</b> Sve postavljaš i vodiš sam i plaćaš ~150–400 € mjesečno bez obzira na zaradu. Treba ti i registrovana firma sa svojim Stripe nalogom — koji u Crnoj Gori praktično ne radi — a firma znači poreze, knjigovođu i papirologiju koje sam nosiš.</li>
+    </ul>
+    <p class="verdict">Razlika je jednostavna: kod svih ostalih ti sve postavljaš i vodiš sam. Kod mene se baviš samo treningom — izrada, naplata i tehnika su moja briga. To je ono za šta plaćaš, i većini trenera se isplati.</p>
+  </section>
+
+  <section>
+    <p class="kicker">Kome odgovara</p>
+    <p><strong>Ima smisla</strong> ako već imaš ljude koji te prate i trening koji vrijedi platiti.</p>
+    <p><strong>Nema smisla</strong> ako tek krećeš i nemaš publiku. Aplikacija ti neće stvoriti publiku — to je na tebi. Ja dajem alat; ljudi i sadržaj su tvoji.</p>
+  </section>
+
+  <section>
+    <p class="end">To je to. Bez pritiska — ako ti zvuči zanimljivo, javi mi pa popričamo na miru. Ako ne, sve u redu; bar znaš da postoji.</p>
+  </section>
+
+  <footer>Skice i nazivi su primjer. Aplikacija nosi tvoje ime i tvoj brend.</footer>
+
+</div>
